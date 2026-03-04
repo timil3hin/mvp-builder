@@ -263,11 +263,17 @@ function QuestionSlide({ q, value, onChange, stepNum, total, onNext, onBack }) {
   );
 }
 
-function EchoSlide({ echoRows, onConfirm, onEdit, confirmLabel = "Generate" }) {
+function EchoSlide({ echoRows, onConfirm, onEdit, confirmLabel = "Generate", showConfirmPrompt = false }) {
   return (
     <Motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card">
       <div className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4">Verification</div>
-      <h2 className="text-2xl font-bold text-white mb-6">Confirm Requirements</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">Confirm Requirements</h2>
+      {showConfirmPrompt && (
+        <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+          Let me confirm I understand your project correctly. Is this accurate? Should I adjust anything before creating your research prompt?
+        </p>
+      )}
+      {!showConfirmPrompt && <div className="mb-6" />}
       
       <div className="space-y-1 bg-white/[0.02] rounded-xl border border-white/5 p-2 mb-8 max-h-80 overflow-y-auto">
         {echoRows.map(([k, v]) => v ? (
@@ -387,40 +393,75 @@ function Part1({ userType, setUserType, globalAnswers, setGlobalAnswers, onCompl
 
   const Q1 = {
     A: [
-      { id:"idea", type:"textarea", q:"What's your app idea?", hint:"Describe it simply—what problem does it solve?" },
-      { id:"users", type:"textarea", q:"Who is your target audience?", hint:"e.g., 'Freelancers', 'Busy parents', 'Crypto traders'" },
-      { id:"existing", type:"textarea", q:"Any similar apps?", hint:"What do people use right now?" },
-      { id:"differentiator", type:"textarea", q:"What's your differentiator?", hint:"Why would someone switch to your app?" },
-      { id:"features", type:"textarea", q:"Must-have features?", hint:"List the top 3 essentials for launch." },
-      { id:"platform", type:"choice", q:"Primary platform?", options:["Mobile App","Web App","Desktop","Browser Extension"] },
-      { id:"timeline", type:"choice", q:"Target timeline?", options:["1-2 weeks","1 month","3 months","Not sure"] },
-      { id:"budget", type:"choice", q:"Budget focus?", options:["Free tiers only","Budget-friendly","Premium/Scaling","Flexible"] },
+      { id:"idea", type:"textarea", q:"What's your app idea?", hint:"Describe it like you're explaining to a friend — what problem does it solve?" },
+      { id:"users", type:"textarea", q:"Who needs this most?", hint:"Describe your ideal user — e.g., 'busy parents', 'small business owners', 'students'" },
+      { id:"existing", type:"textarea", q:"What's out there already?", hint:"Name any similar apps or current solutions people use." },
+      { id:"differentiator", type:"textarea", q:"What would make someone choose YOUR app?", hint:"What's the special sauce?" },
+      { id:"features", type:"textarea", q:"What are the 3 absolute must-have features for launch?", hint:"Just the essentials!" },
+      { id:"platform", type:"choice", q:"How do you imagine people using this?", options:["Mobile App","Web App","Both Mobile & Web","Not sure"] },
+      { id:"timeline", type:"choice", q:"What's your timeline?", options:["Days","Weeks","Months","Not sure"] },
+      { id:"budget", type:"choice", q:"Budget reality check: can you spend money on tools/services?", options:["Free only — need everything free","Some budget — budget-friendly tools ok","Comfortable spending — premium ok","Flexible"] },
     ],
     B: [
-      { id:"topic", type:"textarea", q:"Research topic & context?", hint:"Define the technical domain and product goal." },
-      { id:"questions", type:"textarea", q:"Specific research questions?", hint:"List 3-5 technical or business unknowns." },
-      { id:"decisions", type:"textarea", q:"Key decisions this informs?", hint:"Architecture, stack, or API choices?" },
-      { id:"scope", type:"textarea", q:"Research scope?", hint:"What's included and what's out of bounds?" },
-      { id:"depth", type:"textarea", q:"Required depth?", hint:"Surface, Deep, or Comprehensive for each area?" },
-      { id:"sources", type:"textarea", q:"Preferred sources?", hint:"Docs, GitHub, Industry Reports, etc." },
-      { id:"constraints", type:"textarea", q:"Technical constraints?", hint:"Specific languages or regulations?" },
-      { id:"context", type:"choice", q:"Business context?", options:["Personal project","Seed startup","Enterprise","Client work"] },
+      { id:"topic", type:"textarea", q:"What's your main research topic and project context?", hint:"Include the technical domain and what you're building." },
+      { id:"questions", type:"textarea", q:"List 3–5 specific questions your research must answer.", hint:"Be detailed — these will drive the entire research output." },
+      { id:"decisions", type:"textarea", q:"What technical decisions will this research inform?", hint:"e.g., architecture choices, stack selection, integrations." },
+      { id:"scope", type:"textarea", q:"Define your scope boundaries.", hint:"What's explicitly included — and what's explicitly excluded?" },
+      { id:"depth", type:"textarea", q:"For each area, specify the depth needed.", hint:"Market Analysis, Technical Architecture, Competitor Analysis, Implementation Options, Cost Analysis — Surface / Deep / Comprehensive?" },
+      { id:"sources", type:"textarea", q:"Rank your preferred information sources by priority (1–7).", hint:"Academic papers, Technical docs, GitHub repos, Industry reports, User forums/Reddit, Competitor analysis, Case studies." },
+      { id:"constraints", type:"textarea", q:"Any technical constraints?", hint:"Specific languages, frameworks, platforms, or compliance requirements?" },
+      { id:"context", type:"choice", q:"What's the business context?", options:["Side project","Startup","Enterprise","Client work"] },
     ],
     C: [
-      { id:"idea", type:"textarea", q:"Idea & your skill level?", hint:"What are you building and what do you know?" },
-      { id:"problem", type:"textarea", q:"What's the core problem?", hint:"Be specific about the pain point." },
-      { id:"research", type:"textarea", q:"What do we need to find?", hint:"List technical and business research needs." },
-      { id:"existing", type:"textarea", q:"Current alternatives?", hint:"What do you like/dislike about them?" },
-      { id:"platform", type:"multi", q:"Target platforms:", options:["Web","Mobile","Desktop","CLI"] },
-      { id:"stack", type:"textarea", q:"Tech preferences?", hint:"Preferred languages or frameworks?" },
-      { id:"timeline", type:"textarea", q:"Goals & metrics?", hint:"How will you measure MVP success?" },
-      { id:"budget", type:"choice", q:"Budget for tools?", options:["Free only","Under $50/mo","Under $200/mo","Flexible"] },
+      { id:"idea", type:"textarea", q:"Tell me about your project idea and your current skills.", hint:"What can you code, and where do you need help?" },
+      { id:"problem", type:"textarea", q:"What problem are you solving? Who has this problem most?", hint:"Be specific about the pain point and who feels it." },
+      { id:"research", type:"textarea", q:"What specific things do you need to research?", hint:"List both technical and business aspects." },
+      { id:"existing", type:"textarea", q:"What similar solutions exist?", hint:"What do you like and dislike about them?" },
+      { id:"platform", type:"multi", q:"Platform preferences:", options:["Web app (works in browser)","Mobile app (iOS/Android)","Desktop app","Not sure — help me decide"] },
+      { id:"stack", type:"textarea", q:"What's your technical comfort zone?", hint:"Languages/frameworks you know. Willing to learn new tools? Prefer familiar or optimal?" },
+      { id:"timeline", type:"textarea", q:"What's your timeline and how will you measure success?", hint:"When do you want to launch and what does success look like?" },
+      { id:"budget", type:"choice", q:"Budget for tools and services?", options:["Free only","Under $50/month","Under $200/month","Flexible"] },
     ]
   };
 
   const qs = userType ? Q1[userType] : [];
   const q = qs[step];
   const save = (id, val) => setAnswers(a => ({ ...a, [id]: val }));
+
+  // Spec-required 7-field echo template, mapped per user type
+  const ECHO_MAPS = {
+    A: [
+      ["Project",       a => a.idea],
+      ["Target Users",  a => a.users],
+      ["Problem Solved",a => a.idea],
+      ["Key Features",  a => a.features],
+      ["Platform",      a => a.platform],
+      ["Timeline",      a => a.timeline],
+      ["Budget",        a => a.budget],
+    ],
+    B: [
+      ["Project",       a => a.topic],
+      ["Target Users",  a => a.context],
+      ["Problem Solved",a => a.questions],
+      ["Key Features",  a => a.decisions],
+      ["Platform",      a => a.constraints],
+      ["Timeline",      a => a.scope],
+      ["Budget",        a => a.depth],
+    ],
+    C: [
+      ["Project",       a => a.idea],
+      ["Target Users",  a => a.problem],
+      ["Problem Solved",a => a.research],
+      ["Key Features",  a => a.existing],
+      ["Platform",      a => Array.isArray(a.platform) ? a.platform.join(", ") : a.platform],
+      ["Timeline",      a => a.timeline],
+      ["Budget",        a => a.budget],
+    ],
+  };
+
+  const echoRows = userType
+    ? ECHO_MAPS[userType].map(([label, getter]) => [label, getter(answers)])
+    : Object.entries(answers);
 
   const generateResearchPrompt = (type, a) => {
     return `## Deep Research Request: ${a.idea || a.topic || "My MVP"}
@@ -467,7 +508,7 @@ Instructions: Analyze competitors, technical feasibility, MVP scope, and provide
           onBack={step > 0 ? () => setStep(s=>s-1) : () => setPhase("type")} 
         />
       )}
-      {phase === "echo" && <EchoSlide echoRows={Object.entries(answers)} onConfirm={finish} onEdit={() => setStep(qs.length - 1)} />}
+      {phase === "echo" && <EchoSlide echoRows={echoRows} onConfirm={finish} onEdit={() => setStep(qs.length - 1)} showConfirmPrompt />}
       {phase === "output" && <OutputSlide title="Research Strategy" content={output} filename="research-prompt.md" onNext={() => onComplete(output, true)} nextLabel="Create PRD" />}
     </div>
   );
